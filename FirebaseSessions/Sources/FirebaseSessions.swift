@@ -89,10 +89,15 @@ protocol SessionsProvider {
 
     super.init()
 
+    Logger.logDebug("Version \(FirebaseVersion())")
+
     self.initiator.beginListening {
       // On each session start, first update Settings if expired
       self.settings.updateSettings()
       let session = self.sessionGenerator.generateNewSession()
+
+      Logger.logDebug("Initiated new Session with ID: \(session.sessionId)")
+
       // Generate a session start event only when session data collection is enabled and if the session is allowed to dispatch events
       if self.settings.sessionsEnabled, session.shouldDispatchEvents {
         let event = SessionStartEvent(sessionInfo: session, appInfo: self.appInfo)
@@ -101,7 +106,7 @@ protocol SessionsProvider {
           }
         }
       } else {
-        Logger.logDebug("Session logging is disabled by configuration settings.")
+        Logger.logDebug("Session Event logging is disabled sessionsEnabled: \(self.settings.sessionsEnabled), shouldDispatchEvents: \(session.shouldDispatchEvents)")
       }
     }
   }
